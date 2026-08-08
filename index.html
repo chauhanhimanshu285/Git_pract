@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -254,11 +253,6 @@
   <!-- Music Controls -->
   <button class="music-btn" id="musicToggle" onclick="toggleAudio()">🎵 Play Music</button>
 
-  <audio id="bgMusic" loop preload="auto" crossorigin="anonymous">
-    <source src="https://actions.google.com/sounds/v1/holidays/happy_birthday_short.ogg" type="audio/ogg">
-    <source src="https://raw.githubusercontent.com/rafaelreis-hotmart/Audio-Sample/main/sample.mp3" type="audio/mpeg">
-  </audio>
-
   <div class="container">
     <header>
       <h1>Happy Birthday, Ankita! ✨</h1>
@@ -317,27 +311,98 @@ May the Force be with you! 🌌
   <script>
     let candleBlown = false;
     let endConfettiTriggered = false;
-    const bgMusic = document.getElementById('bgMusic');
     let audioCtx = null;
+    let isPlayingMusic = false;
+    let musicTimer = null;
 
-    function startMusic() {
-      bgMusic.play().then(() => {
-        document.getElementById('musicToggle').innerText = "⏸️ Pause Music";
-      }).catch(err => {
-        console.log("Playback error: ", err);
-      });
+    // Musical Notes for Happy Birthday Tune (Frequencies in Hz)
+    const notes = {
+      'C4': 261.63, 'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'G4': 392.00,
+      'A4': 440.00, 'B4': 493.88, 'C5': 523.25
+    };
+
+    const tune = [
+      { note: 'C4', duration: 0.3 }, { note: 'C4', duration: 0.3 }, { note: 'D4', duration: 0.6 },
+      { note: 'C4', duration: 0.6 }, { note: 'F4', duration: 0.6 }, { note: 'E4', duration: 1.0 },
+      
+      { note: 'C4', duration: 0.3 }, { note: 'C4', duration: 0.3 }, { note: 'D4', duration: 0.6 },
+      { note: 'C4', duration: 0.6 }, { note: 'G4', duration: 0.6 }, { note: 'F4', duration: 1.0 },
+      
+      { note: 'C4', duration: 0.3 }, { note: 'C4', duration: 0.3 }, { note: 'C5', duration: 0.6 },
+      { note: 'A4', duration: 0.6 }, { note: 'F4', duration: 0.6 }, { note: 'E4', duration: 0.6 }, { note: 'D4', duration: 0.8 },
+      
+      { note: 'A4', duration: 0.3 }, { note: 'A4', duration: 0.3 }, { note: 'F4', duration: 0.6 },
+      { note: 'G4', duration: 0.6 }, { note: 'F4', duration: 1.2 }
+    ];
+
+    function initAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
     }
 
-    // Synthesized Confetti Pop/Blast Sound Effect
+    // Play a Synthesized Musical Note
+    function playNote(freq, duration) {
+      if (!isPlayingMusic || !audioCtx) return;
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    }
+
+    // Loop Happy Birthday Melody
+    function startSynthesizedMusic() {
+      initAudioContext();
+      if (isPlayingMusic) return;
+
+      isPlayingMusic = true;
+      document.getElementById('musicToggle').innerText = "⏸️ Pause Music";
+
+      let noteIndex = 0;
+      function step() {
+        if (!isPlayingMusic) return;
+
+        const current = tune[noteIndex];
+        playNote(notes[current.note], current.duration);
+
+        noteIndex = (noteIndex + 1) % tune.length;
+        musicTimer = setTimeout(step, current.duration * 600 + 100);
+      }
+      step();
+    }
+
+    function stopSynthesizedMusic() {
+      isPlayingMusic = false;
+      clearTimeout(musicTimer);
+      document.getElementById('musicToggle').innerText = "🎵 Play Music";
+    }
+
+    function toggleAudio() {
+      if (isPlayingMusic) {
+        stopSynthesizedMusic();
+      } else {
+        startSynthesizedMusic();
+      }
+    }
+
+    // Synthesized Confetti Pop Sound
     function playConfettiSound() {
       try {
-        if (!audioCtx) {
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtx.state === 'suspended') {
-          audioCtx.resume();
-        }
-
+        initAudioContext();
         const bufferSize = audioCtx.sampleRate * 0.3; 
         const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
         const data = buffer.getChannelData(0);
@@ -365,16 +430,6 @@ May the Force be with you! 🌌
       } catch(e) {}
     }
 
-    function toggleAudio() {
-      const btn = document.getElementById('musicToggle');
-      if (bgMusic.paused) {
-        startMusic();
-      } else {
-        bgMusic.pause();
-        btn.innerText = "🎵 Play Music";
-      }
-    }
-
     function extinguishCandles() {
       if (!candleBlown) {
         const flames = document.querySelectorAll('.flame-item');
@@ -383,11 +438,9 @@ May the Force be with you! 🌌
         document.getElementById('micBtn').style.display = 'none';
         candleBlown = true;
         
-        // Start background music automatically on candle blow
-        startMusic();
-
-        // Confetti burst + blast sound
+        startSynthesizedMusic();
         playConfettiSound();
+
         confetti({
           particleCount: 160,
           spread: 90,
@@ -398,8 +451,7 @@ May the Force be with you! 🌌
 
     // Mic Blow Detection
     async function startMicDetection() {
-      // Start music on button tap
-      startMusic();
+      startSynthesizedMusic();
 
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -440,7 +492,7 @@ May the Force be with you! 🌌
       }
     }
 
-    // Automatic Confetti + Blast Sound on Scroll
+    // Scroll Confetti
     window.addEventListener('scroll', () => {
       if (!endConfettiTriggered) {
         const scrollPosition = window.innerHeight + window.scrollY;
@@ -457,13 +509,6 @@ May the Force be with you! 🌌
         }
       }
     });
-
-    // Unmute audio handler for screen tap
-    document.addEventListener('touchstart', () => {
-      if (bgMusic.paused && !candleBlown) {
-        startMusic();
-      }
-    }, { once: true });
   </script>
 </body>
 </html>
