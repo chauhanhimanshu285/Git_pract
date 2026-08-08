@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,7 +26,6 @@
     }
 
     body {
-      background: #f4e2d8;
       background: linear-gradient(to bottom, #f5f7fa, #c3cfe2);
       color: var(--text);
       display: flex;
@@ -254,8 +254,9 @@
   <!-- Music Controls -->
   <button class="music-btn" id="musicToggle" onclick="toggleAudio()">🎵 Play Music</button>
 
-  <audio id="bgMusic" loop>
-    <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a8e3f2.mp3?filename=happy-birthday-157225.mp3" type="audio/mpeg">
+  <audio id="bgMusic" loop preload="auto" crossorigin="anonymous">
+    <source src="https://actions.google.com/sounds/v1/holidays/happy_birthday_short.ogg" type="audio/ogg">
+    <source src="https://raw.githubusercontent.com/rafaelreis-hotmart/Audio-Sample/main/sample.mp3" type="audio/mpeg">
   </audio>
 
   <div class="container">
@@ -317,12 +318,57 @@ May the Force be with you! 🌌
     let candleBlown = false;
     let endConfettiTriggered = false;
     const bgMusic = document.getElementById('bgMusic');
+    let audioCtx = null;
+
+    function startMusic() {
+      bgMusic.play().then(() => {
+        document.getElementById('musicToggle').innerText = "⏸️ Pause Music";
+      }).catch(err => {
+        console.log("Playback error: ", err);
+      });
+    }
+
+    // Synthesized Confetti Pop/Blast Sound Effect
+    function playConfettiSound() {
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+
+        const bufferSize = audioCtx.sampleRate * 0.3; 
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(800, audioCtx.currentTime);
+        filter.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.25);
+
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        noise.start();
+      } catch(e) {}
+    }
 
     function toggleAudio() {
       const btn = document.getElementById('musicToggle');
       if (bgMusic.paused) {
-        bgMusic.play();
-        btn.innerText = "⏸️ Pause Music";
+        startMusic();
       } else {
         bgMusic.pause();
         btn.innerText = "🎵 Play Music";
@@ -337,13 +383,13 @@ May the Force be with you! 🌌
         document.getElementById('micBtn').style.display = 'none';
         candleBlown = true;
         
-        // Auto-play music when candles are blown
-        bgMusic.play().catch(() => {});
-        document.getElementById('musicToggle').innerText = "⏸️ Pause Music";
+        // Start background music automatically on candle blow
+        startMusic();
 
-        // Confetti burst on candle blow
+        // Confetti burst + blast sound
+        playConfettiSound();
         confetti({
-          particleCount: 150,
+          particleCount: 160,
           spread: 90,
           origin: { y: 0.5 }
         });
@@ -352,11 +398,14 @@ May the Force be with you! 🌌
 
     // Mic Blow Detection
     async function startMicDetection() {
+      // Start music on button tap
+      startMusic();
+
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const analyser = audioContext.createAnalyser();
-        const microphone = audioContext.createMediaStreamSource(stream);
+        const micAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const analyser = micAudioCtx.createAnalyser();
+        const microphone = micAudioCtx.createMediaStreamSource(stream);
         
         analyser.fftSize = 256;
         microphone.connect(analyser);
@@ -380,7 +429,7 @@ May the Force be with you! 🌌
           if (average > 42) {
             extinguishCandles();
             stream.getTracks().forEach(track => track.stop());
-            audioContext.close();
+            micAudioCtx.close();
           } else {
             requestAnimationFrame(checkVolume);
           }
@@ -391,7 +440,7 @@ May the Force be with you! 🌌
       }
     }
 
-    // Automatic Confetti Burst on Scroll to End
+    // Automatic Confetti + Blast Sound on Scroll
     window.addEventListener('scroll', () => {
       if (!endConfettiTriggered) {
         const scrollPosition = window.innerHeight + window.scrollY;
@@ -399,6 +448,7 @@ May the Force be with you! 🌌
         
         if (scrollPosition >= threshold) {
           endConfettiTriggered = true;
+          playConfettiSound();
           confetti({
             particleCount: 180,
             spread: 100,
@@ -407,7 +457,13 @@ May the Force be with you! 🌌
         }
       }
     });
+
+    // Unmute audio handler for screen tap
+    document.addEventListener('touchstart', () => {
+      if (bgMusic.paused && !candleBlown) {
+        startMusic();
+      }
+    }, { once: true });
   </script>
 </body>
 </html>
-
