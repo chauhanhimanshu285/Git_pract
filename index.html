@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Happy Birthday!</title>
+  <title>Happy Birthday Ankita!</title>
   
   <!-- Canvas Confetti CDN -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   
   <style>
     :root {
-      --bg-color: #fdfbf7;
-      --card-bg: #ffffff;
-      --accent: #ff7e67;
+      --bg-gradient: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --accent: #ff6b6b;
       --text: #2c3e50;
-      --subtext: #7f8c8d;
+      --subtext: #636e72;
     }
 
     * {
@@ -25,141 +25,190 @@
     }
 
     body {
-      background-color: var(--bg-color);
+      background: #f4e2d8;
+      background: linear-gradient(to bottom, #f5f7fa, #c3cfe2);
       color: var(--text);
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 40px 20px;
+      padding: 30px 15px 60px 15px;
       line-height: 1.6;
+      min-height: 100vh;
     }
 
     .container {
-      max-width: 600px;
+      max-width: 500px;
       width: 100%;
       text-align: center;
     }
 
+    /* Music Control Floating Button */
+    .music-btn {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      background: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 50px;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 1000;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
     header {
-      margin-bottom: 30px;
+      margin-bottom: 25px;
+      margin-top: 20px;
     }
 
     h1 {
       font-size: 2.2rem;
-      color: var(--accent);
-      margin-bottom: 10px;
+      color: #ee5253;
+      margin-bottom: 8px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
     }
 
     p.subtitle {
       color: var(--subtext);
-      font-size: 1.05rem;
+      font-size: 1rem;
     }
 
-    /* Cake & Candle Section */
+    /* Realistic Cake Section */
     .cake-section {
       background: var(--card-bg);
-      border-radius: 16px;
-      padding: 30px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-      margin-bottom: 30px;
+      border-radius: 20px;
+      padding: 30px 20px 20px 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      margin-bottom: 25px;
+      backdrop-filter: blur(5px);
     }
 
-    .cake-wrapper {
+    .cake-container {
       position: relative;
-      width: 120px;
-      height: 120px;
-      margin: 0 auto 20px auto;
+      width: 180px;
+      height: 140px;
+      margin: 0 auto 15px auto;
       cursor: pointer;
     }
 
-    .cake {
-      width: 120px;
-      height: 80px;
-      background: #f8c291;
-      border-radius: 10px 10px 0 0;
+    /* Plate */
+    .plate {
+      width: 200px;
+      height: 14px;
+      background: #e0e0e0;
+      border-radius: 10px;
       position: absolute;
-      bottom: 0;
-      box-shadow: inset 0 -10px 0 #e77f67;
+      bottom: -5px;
+      left: -10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     }
 
-    .cake::before {
-      content: '';
+    /* Cake Base */
+    .cake-layer {
+      width: 160px;
+      height: 75px;
+      background: linear-gradient(to right, #f7a1a1, #f19090, #e27575);
+      border-radius: 12px 12px 4px 4px;
+      position: absolute;
+      bottom: 8px;
+      left: 10px;
+      box-shadow: inset 0 -12px 0 #d65a5a, inset 0 8px 0 #fff0f0;
+    }
+
+    /* Frosting drips */
+    .frosting {
+      width: 160px;
+      height: 20px;
+      background: #ffffff;
+      border-radius: 10px 10px 12px 12px;
       position: absolute;
       top: 0;
-      left: 0;
-      width: 100%;
-      height: 20px;
-      background: #e77f67;
-      border-radius: 10px 10px 0 0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
 
-    .candle {
-      width: 12px;
-      height: 35px;
-      background: #78e08f;
+    /* Multiple Candles */
+    .candles-group {
       position: absolute;
-      top: 15px;
-      left: 54px;
-      border-radius: 3px;
+      top: 25px;
+      left: 30px;
+      width: 120px;
+      display: flex;
+      justify-content: space-between;
     }
 
-    .flame {
-      width: 14px;
-      height: 20px;
-      background: #f6b93b;
+    .candle-item {
+      position: relative;
+      width: 10px;
+      height: 35px;
+      background: repeating-linear-gradient(45deg, #74b9ff, #74b9ff 5px, #0984e3 5px, #0984e3 10px);
+      border-radius: 3px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .flame-item {
+      width: 12px;
+      height: 18px;
+      background: radial-gradient(ellipse at bottom, #fffa65 0%, #ffaf40 100%);
       border-radius: 50% 50% 20% 20%;
       position: absolute;
-      top: -18px;
+      top: -16px;
       left: -1px;
-      box-shadow: 0 0 10px #f6b93b;
-      animation: flicker 0.6s infinite alternate;
-      transition: opacity 0.5s ease;
+      box-shadow: 0 0 12px #ffaf40, 0 0 4px #fffa65;
+      animation: flicker 0.5s infinite alternate ease-in-out;
+      transition: opacity 0.4s ease;
     }
 
-    .flame.off {
+    .flame-item.off {
       opacity: 0;
       box-shadow: none;
     }
 
     @keyframes flicker {
-      0% { transform: scale(1); }
-      100% { transform: scale(1.15); }
+      0% { transform: scale(1) rotate(-1deg); }
+      100% { transform: scale(1.15) rotate(1deg); }
     }
 
-    .mic-btn {
-      background-color: #2ec4b6;
+    .mic-btn-action {
+      background: linear-gradient(135deg, #10ac84, #1dd1a1);
       color: white;
       border: none;
       padding: 10px 20px;
-      border-radius: 20px;
+      border-radius: 25px;
       font-size: 0.9rem;
       font-weight: 600;
       cursor: pointer;
-      margin-bottom: 10px;
+      margin-top: 10px;
+      box-shadow: 0 4px 12px rgba(29, 209, 161, 0.3);
     }
 
     .hint-text {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: var(--subtext);
+      margin-top: 8px;
     }
 
     /* Photo Gallery */
     .photos-section {
-      margin-bottom: 30px;
+      margin-bottom: 25px;
     }
 
     .photos-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 15px;
-      margin-top: 15px;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
     }
 
     .photo-card {
       background: var(--card-bg);
-      border-radius: 12px;
+      border-radius: 14px;
       overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
       aspect-ratio: 1 / 1;
     }
 
@@ -169,61 +218,67 @@
       object-fit: cover;
     }
 
-    /* Message Section */
+    /* Message Card */
     .message-section {
       background: var(--card-bg);
-      border-radius: 16px;
-      padding: 30px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      border-radius: 20px;
+      padding: 25px 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
       text-align: left;
+      margin-bottom: 25px;
     }
 
     .message-section h2 {
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       margin-bottom: 12px;
-      color: var(--accent);
+      color: #ee5253;
       text-align: center;
     }
 
     .message-body {
-      color: #4a5568;
-      font-size: 1rem;
+      color: #3d464d;
+      font-size: 0.98rem;
+      line-height: 1.7;
       white-space: pre-line;
     }
 
-    /* Confetti Button */
-    .celebrate-btn {
-      margin-top: 25px;
-      padding: 12px 28px;
-      background-color: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 25px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
+    .footer-note {
+      font-size: 0.85rem;
+      color: #888;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
 
+  <!-- Music Controls -->
+  <button class="music-btn" id="musicToggle" onclick="toggleAudio()">🎵 Play Music</button>
+
+  <audio id="bgMusic" loop>
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a8e3f2.mp3?filename=happy-birthday-157225.mp3" type="audio/mpeg">
+  </audio>
+
   <div class="container">
     <header>
-      <h1>Happy Birthday, [Her Name]! ✨</h1>
-      <p class="subtitle">Wishing you a great year full of success and happiness.</p>
+      <h1>Happy Birthday, Ankita! ✨</h1>
+      <p class="subtitle">Wishing you a wonderful day filled with happiness!</p>
     </header>
 
-    <!-- Interactive Cake -->
+    <!-- Realistic Multi-Candle Cake -->
     <section class="cake-section">
-      <div class="cake-wrapper" id="cakeWrapper" onclick="extinguishCandle()">
-        <div class="cake">
-          <div class="candle">
-            <div class="flame" id="candleFlame"></div>
-          </div>
+      <div class="cake-container" onclick="extinguishCandles()">
+        <div class="candles-group">
+          <div class="candle-item"><div class="flame-item flame"></div></div>
+          <div class="candle-item"><div class="flame-item flame"></div></div>
+          <div class="candle-item"><div class="flame-item flame"></div></div>
         </div>
+        <div class="cake-layer">
+          <div class="frosting"></div>
+        </div>
+        <div class="plate"></div>
       </div>
-      <button class="mic-btn" id="micBtn" onclick="startMicDetection()">🎙️ Tap to enable Blow Detection</button>
-      <p class="hint-text" id="cakeStatus">Or simply tap the candle to blow it out!</p>
+      <button class="mic-btn-action" id="micBtn" onclick="startMicDetection()">🎙️ Tap to Blow Candles</button>
+      <p class="hint-text" id="cakeStatus">Or tap the candles directly to blow them out!</p>
     </section>
 
     <!-- Photo Gallery -->
@@ -241,55 +296,64 @@
       </div>
     </section>
 
-    <!-- Friendly Message Card -->
-    <section class="message-section">
-      <h2>A Quick Birthday Note 📝</h2>
+    <!-- Message Section -->
+    <section class="message-section" id="messageSection">
+      <h2>A Wish For You 📝</h2>
       <div class="message-body">
-Hey [Her Name],
+Hey Ankita,
 
-Hope you have an awesome birthday today! Just wanted to take a moment to celebrate you—you bring great energy wherever you go and make everything more fun.
+Wishing you good luck and good health and unimaginable success ahead! 🌟
 
-May this upcoming year bring you lots of success, amazing experiences, and everything you've been working towards.
+Keep your smile always and be kind to me 😂
 
-Enjoy your special day! 🎉
+May the Force be with you! 🌌
       </div>
     </section>
 
-    <button class="celebrate-btn" onclick="triggerConfetti()">Celebrate Again! 🎊</button>
+    <p class="footer-note">Made with ✨ for your special day</p>
   </div>
 
   <script>
     let candleBlown = false;
+    let endConfettiTriggered = false;
+    const bgMusic = document.getElementById('bgMusic');
 
-    function triggerConfetti() {
-      confetti({
-        particleCount: 100,
-        spread: 80,
-        origin: { y: 0.6 }
-      });
+    function toggleAudio() {
+      const btn = document.getElementById('musicToggle');
+      if (bgMusic.paused) {
+        bgMusic.play();
+        btn.innerText = "⏸️ Pause Music";
+      } else {
+        bgMusic.pause();
+        btn.innerText = "🎵 Play Music";
+      }
     }
 
-    function extinguishCandle() {
+    function extinguishCandles() {
       if (!candleBlown) {
-        document.getElementById('candleFlame').classList.add('off');
+        const flames = document.querySelectorAll('.flame-item');
+        flames.forEach(flame => flame.classList.add('off'));
         document.getElementById('cakeStatus').innerText = "Make a wish! ✨";
         document.getElementById('micBtn').style.display = 'none';
         candleBlown = true;
         
-        setTimeout(() => {
-          confetti({
-            particleCount: 160,
-            spread: 100,
-            origin: { y: 0.5 }
-          });
-        }, 150);
+        // Auto-play music when candles are blown
+        bgMusic.play().catch(() => {});
+        document.getElementById('musicToggle').innerText = "⏸️ Pause Music";
+
+        // Confetti burst on candle blow
+        confetti({
+          particleCount: 150,
+          spread: 90,
+          origin: { y: 0.5 }
+        });
       }
     }
 
-    // Audio Analysis for Blowing Detection
+    // Mic Blow Detection
     async function startMicDetection() {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
         const analyser = audioContext.createAnalyser();
         const microphone = audioContext.createMediaStreamSource(stream);
@@ -300,7 +364,7 @@ Enjoy your special day! 🎉
         const bufferLength = analyser.frequencyBinCount;
         const dataArray = new Uint8Array(bufferLength);
 
-        document.getElementById('micBtn').innerText = "💨 Blow into your microphone!";
+        document.getElementById('micBtn').innerText = "💨 Blow into mic now!";
         document.getElementById('cakeStatus').innerText = "Listening for your blow...";
 
         function checkVolume() {
@@ -313,22 +377,37 @@ Enjoy your special day! 🎉
           }
           let average = sum / bufferLength;
 
-          // Threshold for blow detection (usually around 40-50 for blowing noise)
-          if (average > 45) {
-            extinguishCandle();
-            // Stop tracks
+          if (average > 42) {
+            extinguishCandles();
             stream.getTracks().forEach(track => track.stop());
             audioContext.close();
           } else {
             requestAnimationFrame(checkVolume);
           }
         }
-
         checkVolume();
       } catch (err) {
-        document.getElementById('cakeStatus').innerText = "Mic access blocked. You can still tap the candle!";
+        document.getElementById('cakeStatus').innerText = "Mic blocked. You can tap the candles!";
       }
     }
+
+    // Automatic Confetti Burst on Scroll to End
+    window.addEventListener('scroll', () => {
+      if (!endConfettiTriggered) {
+        const scrollPosition = window.innerHeight + window.scrollY;
+        const threshold = document.body.offsetHeight - 50;
+        
+        if (scrollPosition >= threshold) {
+          endConfettiTriggered = true;
+          confetti({
+            particleCount: 180,
+            spread: 100,
+            origin: { y: 0.8 }
+          });
+        }
+      }
+    });
   </script>
 </body>
 </html>
+
