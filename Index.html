@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Happy Birthday!</title>
+  
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
+  <style>
+    :root {
+      --bg-color: #fdfbf7;
+      --card-bg: #ffffff;
+      --accent: #ff7e67;
+      --text: #2c3e50;
+      --subtext: #7f8c8d;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+    }
+
+    header {
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    p.subtitle {
+      color: var(--subtext);
+      font-size: 1.05rem;
+    }
+
+    /* Cake & Candle Section */
+    .cake-section {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      margin-bottom: 30px;
+    }
+
+    .cake-wrapper {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 20px auto;
+      cursor: pointer;
+    }
+
+    .cake {
+      width: 120px;
+      height: 80px;
+      background: #f8c291;
+      border-radius: 10px 10px 0 0;
+      position: absolute;
+      bottom: 0;
+      box-shadow: inset 0 -10px 0 #e77f67;
+    }
+
+    .cake::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 20px;
+      background: #e77f67;
+      border-radius: 10px 10px 0 0;
+    }
+
+    .candle {
+      width: 12px;
+      height: 35px;
+      background: #78e08f;
+      position: absolute;
+      top: 15px;
+      left: 54px;
+      border-radius: 3px;
+    }
+
+    .flame {
+      width: 14px;
+      height: 20px;
+      background: #f6b93b;
+      border-radius: 50% 50% 20% 20%;
+      position: absolute;
+      top: -18px;
+      left: -1px;
+      box-shadow: 0 0 10px #f6b93b;
+      animation: flicker 0.6s infinite alternate;
+      transition: opacity 0.5s ease;
+    }
+
+    .flame.off {
+      opacity: 0;
+      box-shadow: none;
+    }
+
+    @keyframes flicker {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.15); }
+    }
+
+    .mic-btn {
+      background-color: #2ec4b6;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    .hint-text {
+      font-size: 0.9rem;
+      color: var(--subtext);
+    }
+
+    /* Photo Gallery */
+    .photos-section {
+      margin-bottom: 30px;
+    }
+
+    .photos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .photo-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      aspect-ratio: 1 / 1;
+    }
+
+    .photo-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Message Section */
+    .message-section {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      text-align: left;
+    }
+
+    .message-section h2 {
+      font-size: 1.4rem;
+      margin-bottom: 12px;
+      color: var(--accent);
+      text-align: center;
+    }
+
+    .message-body {
+      color: #4a5568;
+      font-size: 1rem;
+      white-space: pre-line;
+    }
+
+    /* Confetti Button */
+    .celebrate-btn {
+      margin-top: 25px;
+      padding: 12px 28px;
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Happy Birthday, [Her Name]! ✨</h1>
+      <p class="subtitle">Wishing you a great year full of success and happiness.</p>
+    </header>
+
+    <!-- Interactive Cake -->
+    <section class="cake-section">
+      <div class="cake-wrapper" id="cakeWrapper" onclick="extinguishCandle()">
+        <div class="cake">
+          <div class="candle">
+            <div class="flame" id="candleFlame"></div>
+          </div>
+        </div>
+      </div>
+      <button class="mic-btn" id="micBtn" onclick="startMicDetection()">🎙️ Tap to enable Blow Detection</button>
+      <p class="hint-text" id="cakeStatus">Or simply tap the candle to blow it out!</p>
+    </section>
+
+    <!-- Photo Gallery -->
+    <section class="photos-section">
+      <div class="photos-grid">
+        <div class="photo-card">
+          <img src="photo1.jpg" alt="Memory 1" />
+        </div>
+        <div class="photo-card">
+          <img src="photo2.jpg" alt="Memory 2" />
+        </div>
+        <div class="photo-card">
+          <img src="photo3.jpg" alt="Memory 3" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Friendly Message Card -->
+    <section class="message-section">
+      <h2>A Quick Birthday Note 📝</h2>
+      <div class="message-body">
+Hey [Her Name],
+
+Hope you have an awesome birthday today! Just wanted to take a moment to celebrate you—you bring great energy wherever you go and make everything more fun.
+
+May this upcoming year bring you lots of success, amazing experiences, and everything you've been working towards.
+
+Enjoy your special day! 🎉
+      </div>
+    </section>
+
+    <button class="celebrate-btn" onclick="triggerConfetti()">Celebrate Again! 🎊</button>
+  </div>
+
+  <script>
+    let candleBlown = false;
+
+    function triggerConfetti() {
+      confetti({
+        particleCount: 100,
+        spread: 80,
+        origin: { y: 0.6 }
+      });
+    }
+
+    function extinguishCandle() {
+      if (!candleBlown) {
+        document.getElementById('candleFlame').classList.add('off');
+        document.getElementById('cakeStatus').innerText = "Make a wish! ✨";
+        document.getElementById('micBtn').style.display = 'none';
+        candleBlown = true;
+        
+        setTimeout(() => {
+          confetti({
+            particleCount: 160,
+            spread: 100,
+            origin: { y: 0.5 }
+          });
+        }, 150);
+      }
+    }
+
+    // Audio Analysis for Blowing Detection
+    async function startMicDetection() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const analyser = audioContext.createAnalyser();
+        const microphone = audioContext.createMediaStreamSource(stream);
+        
+        analyser.fftSize = 256;
+        microphone.connect(analyser);
+
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+
+        document.getElementById('micBtn').innerText = "💨 Blow into your microphone!";
+        document.getElementById('cakeStatus').innerText = "Listening for your blow...";
+
+        function checkVolume() {
+          if (candleBlown) return;
+
+          analyser.getByteFrequencyData(dataArray);
+          let sum = 0;
+          for (let i = 0; i < bufferLength; i++) {
+            sum += dataArray[i];
+          }
+          let average = sum / bufferLength;
+
+          // Threshold for blow detection (usually around 40-50 for blowing noise)
+          if (average > 45) {
+            extinguishCandle();
+            // Stop tracks
+            stream.getTracks().forEach(track => track.stop());
+            audioContext.close();
+          } else {
+            requestAnimationFrame(checkVolume);
+          }
+        }
+
+        checkVolume();
+      } catch (err) {
+        document.getElementById('cakeStatus').innerText = "Mic access blocked. You can still tap the candle!";
+      }
+    }
+  </script>
+</body>
+</html>
